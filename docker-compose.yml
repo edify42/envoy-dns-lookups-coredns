@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  app: # this is our target container
+    image: mendhak/http-https-echo:30
+    environment:
+      - HTTP_PORT=8888
+      - HTTPS_PORT=9999
+    ports:
+      - "8080:8888"
+      - "8443:9999"
+  envoy:
+    image: ${LENDI_IMAGE}
+    volumes:
+      - $PWD/envoy-config:/etc/envoy
+    ports:
+      - "8000:8000"
+      - "12000:12000"
+  coredns:
+    image: coredns/coredns:1.10.1
+# volumes:
+#   envoy-config:
