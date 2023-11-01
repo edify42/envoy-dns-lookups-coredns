@@ -1,0 +1,8 @@
+.:53 {
+    forward . 10.5.0.1
+    log . {
+        class all
+    }
+    errors
+    cache
+}

@@ -1,14 +1,22 @@
 version: "3.8"
 services:
-  app: # this is our target container
+  service: # this is our target container
     image: mendhak/http-https-echo:30
     environment:
-      - HTTP_PORT=8888
-      - HTTPS_PORT=9999
+      - HTTP_PORT=8080
+      - HTTPS_PORT=8443
     ports:
-      - "8080:8888"
-      - "8443:9999"
+      - "8080:8080"
+      - "8443:8443"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.2
   envoy:
+    dns:
+      - "10.5.0.4"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.3
     image: ${LENDI_IMAGE}
     volumes:
       - $PWD/envoy-config:/etc/envoy
@@ -16,6 +24,23 @@ services:
       - "8000:8000"
       - "12000:12000"
   coredns:
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.4
     image: coredns/coredns:1.10.1
+    volumes:
+      - $PWD/coredns:/etc/coredns
+    command: '--conf /etc/coredns/Corefile'
+    ports:
+      - "53"
 # volumes:
 #   envoy-config:
+
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
